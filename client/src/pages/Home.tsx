@@ -24,6 +24,7 @@ import {
   Wrench,
   X,
 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 const services = [
   {
@@ -75,6 +76,7 @@ function scrollToSection(id: string) {
 }
 
 export default function Home() {
+  const bookingMutation = trpc.booking.submit.useMutation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([
@@ -101,8 +103,25 @@ export default function Home() {
     setBookingOpen(true);
   };
 
-  const submitBooking = (event: React.FormEvent<HTMLFormElement>) => {
+  const submitBooking = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const name = String(formData.get("name") ?? "");
+    const phone = String(formData.get("phone") ?? "");
+    const service = String(formData.get("service") ?? "");
+
+    try {
+      const result = await bookingMutation.mutateAsync({ name, phone, service });
+      if (!result.success) {
+        toast.error("تعذر إرسال الطلب", { description: "حاول مرة أخرى أو اتصل بنا مباشرة." });
+        return;
+      }
+    } catch {
+      toast.error("تعذر إرسال الطلب", { description: "حاول مرة أخرى أو اتصل بنا مباشرة." });
+      return;
+    }
+
     setFormSent(true);
     setNotifications((current) => [
       { id: Date.now(), title: "تم استلام طلبك", text: "سنتواصل معك لتأكيد الموعد خلال دقائق.", time: "الآن", unread: true, icon: Check },
@@ -226,7 +245,7 @@ export default function Home() {
 
       <footer className="site-footer"><div className="page-container footer-top"><a className="brand footer-brand" href="#home"><span className="brand-mark"><Wrench size={18} /></span><span>Saleh<span className="brand-dot">.</span></span></a><p>إصلاح يفهم جهازك.<br />وصراحة تقدر تثق فيها.</p><div className="footer-nav"><a href="#home">الرئيسية</a><a href="#services">الخدمات</a><a href="#about">من نحن</a><a href="#contact">تواصل</a></div></div><div className="page-container footer-bottom"><span>© 2026 Saleh. جميع الحقوق محفوظة.</span><span className="footer-legal"><a href="#contact">سياسة الخصوصية</a><a href="#contact">شروط الخدمة</a></span><span dir="ltr">LOS ANGELES · CA</span></div></footer>
 
-      {bookingOpen && <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setBookingOpen(false); }}><div className="booking-modal"><button className="modal-close" onClick={() => setBookingOpen(false)} aria-label="إغلاق"><X size={19} /></button>{formSent ? <div className="success-state"><span className="success-icon"><Check size={28} /></span><h2>وصلنا طلبك.</h2><p>شكرًا لثقتك. سنتواصل معك على الرقم الذي أدخلته لتأكيد الموعد.</p><button className="button button-primary" onClick={() => { setFormSent(false); setBookingOpen(false); }}>تم، شكرًا</button></div> : <><div className="modal-kicker">حجز سريع · مجاني</div><h2 id="booking-title">خلّينا نسمع<br /><em>عن مشكلة جهازك.</em></h2><p className="modal-intro">اترك بياناتك وسنتواصل معك لتأكيد الموعد والوقت المناسب لك.</p><form onSubmit={submitBooking}><label>الاسم الكامل<input required name="name" placeholder="اكتب اسمك" /></label><label>رقم الجوال<input required name="phone" type="tel" placeholder="05x xxx xxxx" dir="ltr" /></label><label>نوع الخدمة<select name="service" defaultValue="screen"><option value="screen">إصلاح شاشة</option><option value="battery">تبديل بطارية</option><option value="software">إصلاح برمجيات</option><option value="data">استعادة بيانات</option></select></label><button className="button button-primary full-button" type="submit">أرسل طلب الحجز <ArrowLeft size={18} /></button></form><div className="modal-note"><ShieldCheck size={15} /> لا نشارك بياناتك مع أي جهة.</div></>}</div></div>}
+      {bookingOpen && <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="booking-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setBookingOpen(false); }}><div className="booking-modal"><button className="modal-close" onClick={() => setBookingOpen(false)} aria-label="إغلاق"><X size={19} /></button>{formSent ? <div className="success-state"><span className="success-icon"><Check size={28} /></span><h2>وصلنا طلبك.</h2><p>شكرًا لثقتك. سنتواصل معك على الرقم الذي أدخلته لتأكيد الموعد.</p><button className="button button-primary" onClick={() => { setFormSent(false); setBookingOpen(false); }}>تم، شكرًا</button></div> : <><div className="modal-kicker">حجز سريع · مجاني</div><h2 id="booking-title">خلّينا نسمع<br /><em>عن مشكلة جهازك.</em></h2><p className="modal-intro">اترك بياناتك وسنتواصل معك لتأكيد الموعد والوقت المناسب لك.</p><form onSubmit={submitBooking}><label>الاسم الكامل<input required name="name" placeholder="اكتب اسمك" /></label><label>رقم الجوال<input required name="phone" type="tel" placeholder="05x xxx xxxx" dir="ltr" /></label><label>نوع الخدمة<select name="service" defaultValue="إصلاح شاشة"><option>إصلاح شاشة</option><option>تبديل بطارية</option><option>إصلاح برمجيات</option><option>استعادة بيانات</option></select></label><button className="button button-primary full-button" type="submit" disabled={bookingMutation.isPending}>{bookingMutation.isPending ? "جاري إرسال الطلب..." : <>أرسل طلب الحجز <ArrowLeft size={18} /></>}</button></form><div className="modal-note"><ShieldCheck size={15} /> لا نشارك بياناتك مع أي جهة.</div></>}</div></div>}
     </div>
   );
 }
