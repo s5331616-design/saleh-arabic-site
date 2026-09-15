@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import {
   ArrowLeft,
   ArrowUpLeft,
   BatteryCharging,
+  Bell,
   Check,
   ChevronDown,
   Clock3,
@@ -75,10 +76,25 @@ function scrollToSection(id: string) {
 
 export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: "التشخيص الأولي مجاني", text: "أرسل طلبك الآن وسنرد عليك خلال دقائق.", time: "الآن", unread: true, icon: ScanSearch },
+    { id: 2, title: "ضمان على كل إصلاح", text: "نوضح لك مدة الضمان قبل بدء العمل.", time: "منذ ساعة", unread: true, icon: ShieldCheck },
+    { id: 3, title: "خصم هذا الأسبوع", text: "خصم 10% على تبديل البطاريات حتى الجمعة.", time: "أمس", unread: false, icon: Sparkles },
+  ]);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [formSent, setFormSent] = useState(false);
+
+  const unreadCount = notifications.filter((notification) => notification.unread).length;
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      toast("تذكير سريع", { description: "التشخيص الأولي مجاني، وبدون أي التزام." });
+    }, 2200);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const openBooking = () => {
     setMobileOpen(false);
@@ -88,7 +104,16 @@ export default function Home() {
   const submitBooking = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormSent(true);
+    setNotifications((current) => [
+      { id: Date.now(), title: "تم استلام طلبك", text: "سنتواصل معك لتأكيد الموعد خلال دقائق.", time: "الآن", unread: true, icon: Check },
+      ...current,
+    ]);
     toast.success("تم استلام طلبك", { description: "سنتواصل معك لتأكيد الموعد خلال دقائق." });
+  };
+
+  const toggleNotifications = () => {
+    setNotificationsOpen((open) => !open);
+    setNotifications((current) => current.map((notification) => ({ ...notification, unread: false })));
   };
 
   return (
@@ -109,6 +134,16 @@ export default function Home() {
           </nav>
           <div className="nav-actions">
             <a className="phone-link" href="tel:+967774572020"><Phone size={16} /> <span dir="ltr">+967 774 572 020</span></a>
+            <div className="notification-wrap">
+              <button className={`notification-button ${notificationsOpen ? "is-active" : ""}`} onClick={toggleNotifications} aria-label="فتح الإشعارات" aria-expanded={notificationsOpen}>
+                <Bell size={17} />
+                {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
+              </button>
+              {notificationsOpen && <div className="notification-panel" role="region" aria-label="الإشعارات">
+                <div className="notification-panel-head"><div><b>الإشعارات</b><small>{unreadCount ? `${unreadCount} جديدة` : "لا توجد إشعارات جديدة"}</small></div><button onClick={() => setNotifications([])}>مسح الكل</button></div>
+                <div className="notification-list">{notifications.length ? notifications.map((notification) => { const Icon = notification.icon; return <button className={`notification-item ${notification.unread ? "unread" : ""}`} key={notification.id} onClick={() => setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, unread: false } : item))}><span className="notification-icon"><Icon size={15} /></span><span className="notification-copy"><b>{notification.title}</b><small>{notification.text}</small><em>{notification.time}</em></span>{notification.unread && <i />}</button>; }) : <div className="notification-empty"><Bell size={22} /><span>أنت على اطلاع بكل جديد</span></div>}</div>
+              </div>}
+            </div>
             <button className="nav-cta" onClick={openBooking}>احجز موعدك <ArrowLeft size={16} /></button>
             <button className="menu-toggle" onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? "إغلاق القائمة" : "فتح القائمة"} aria-expanded={mobileOpen}>
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
