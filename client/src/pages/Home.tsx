@@ -71,6 +71,8 @@ const testimonials = [
   { quote: "سعر واضح قبل أن نبدأ، وفحص حقيقي للجهاز. ارتحت من الغموض الذي واجهته في محلات أخرى.", name: "سارة حسن", place: "ساكنة في باسيفيك بالمز" },
 ];
 
+const whatsappLink = "https://wa.me/967774572020?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%AD%D8%AC%D8%B2%20%D9%85%D9%88%D8%B9%D8%AF%20%D9%84%D8%AA%D8%B4%D8%AE%D9%8A%D8%B5%20%D8%AC%D9%87%D8%A7%D8%B2%D9%8A";
+
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -184,6 +186,7 @@ export default function Home() {
               <div className="hero-actions">
                 <button className="button button-primary" onClick={openBooking}>احجز تشخيصك المجاني <ArrowLeft size={18} /></button>
                 <a className="button button-ghost" href="tel:+967774572020"><Phone size={17} /> اتصل الآن</a>
+                <a className="button button-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer"><MessageCircle size={17} /> واتساب</a>
               </div>
               <div className="hero-proof">
                 <div className="avatar-stack"><span>ع</span><span>م</span><span>س</span><span className="avatar-more">+<small>2k</small></span></div>
@@ -240,7 +243,7 @@ export default function Home() {
 
         <section className="testimonial-section"><div className="page-container"><div className="testimonial-header"><div><div className="eyebrow"><span className="eyebrow-line" /> آراء العملاء</div><h2>ثقة تُبنى مع<br /><em>كل جهاز.</em></h2></div><div className="testimonial-controls"><button onClick={() => setActiveTestimonial((activeTestimonial + testimonials.length - 1) % testimonials.length)} aria-label="التقييم السابق">←</button><span>0{activeTestimonial + 1} / 0{testimonials.length}</span><button onClick={() => setActiveTestimonial((activeTestimonial + 1) % testimonials.length)} aria-label="التقييم التالي">→</button></div></div><div className="testimonial-card"><div className="testimonial-quote"><div className="big-quote">“</div><p>{testimonials[activeTestimonial].quote}</p></div><div className="testimonial-person"><div className="person-avatar">{testimonials[activeTestimonial].name.slice(0, 1)}</div><div><b>{testimonials[activeTestimonial].name}</b><small>{testimonials[activeTestimonial].place}</small></div><div className="testimonial-stars"><Star size={15} fill="currentColor" /><Star size={15} fill="currentColor" /><Star size={15} fill="currentColor" /><Star size={15} fill="currentColor" /><Star size={15} fill="currentColor" /></div></div></div></div></section>
 
-        <section className="cta-section" id="contact"><div className="cta-pattern" /><div className="page-container cta-inner"><div><div className="eyebrow light"><span className="eyebrow-line" /> جاهز نبدأ؟</div><h2>مشكلة في جهازك؟<br /><em>التشخيص علينا.</em></h2><p>نشخّص مشكلتك مجانًا ونخبرك بتكلفة الإصلاح قبل أي خطوة.</p></div><div className="cta-actions"><button className="button button-white" onClick={openBooking}>احجز استشارتك المجانية <ArrowLeft size={18} /></button><a href="tel:+967774572020" className="cta-phone"><Phone size={17} /><span><small>أو اتصل بنا الآن</small><b dir="ltr">+967 774 572 020</b></span></a></div></div></section>
+        <section className="cta-section" id="contact"><div className="cta-pattern" /><div className="page-container cta-inner"><div><div className="eyebrow light"><span className="eyebrow-line" /> جاهز نبدأ؟</div><h2>مشكلة في جهازك؟<br /><em>التشخيص علينا.</em></h2><p>نشخّص مشكلتك مجانًا ونخبرك بتكلفة الإصلاح قبل أي خطوة.</p></div><div className="cta-actions"><button className="button button-white" onClick={openBooking}>احجز استشارتك المجانية <ArrowLeft size={18} /></button><a href={whatsappLink} target="_blank" rel="noreferrer" className="cta-phone whatsapp-contact"><MessageCircle size={17} /><span><small>تواصل معنا على واتساب</small><b dir="ltr">+967 774 572 020</b></span></a></div></div></section>
       </main>
 
       <footer className="site-footer"><div className="page-container footer-top"><a className="brand footer-brand" href="#home"><span className="brand-mark"><Wrench size={18} /></span><span>Saleh<span className="brand-dot">.</span></span></a><p>إصلاح يفهم جهازك.<br />وصراحة تقدر تثق فيها.</p><div className="footer-nav"><a href="#home">الرئيسية</a><a href="#services">الخدمات</a><a href="#about">من نحن</a><a href="#contact">تواصل</a><a href="/admin">دخول المشرف</a></div></div><div className="page-container footer-bottom"><span>© 2026 Saleh. جميع الحقوق محفوظة.</span><span className="footer-legal"><a href="#contact">سياسة الخصوصية</a><a href="#contact">شروط الخدمة</a></span><span dir="ltr">LOS ANGELES · CA</span></div></footer>
